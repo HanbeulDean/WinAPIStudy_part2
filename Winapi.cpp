@@ -6,6 +6,11 @@
 
 #define MAX_LOADSTRING 100
 
+typedef struct _tagRectangle
+{
+	float l, t, r, b;
+}RECTANGLE, *PRECTANGLE;
+
 // 전역 변수:
 HINSTANCE hInst;                                // 현재 인스턴스입니다.
 WCHAR szTitle[MAX_LOADSTRING];                  // 제목 표시줄 텍스트입니다.
@@ -14,7 +19,12 @@ HWND	g_hWnd;
 HDC		g_hDC;
 bool	g_bLoop = true;
 //RECT는 사각형을 그리기 위한 좌표값을 담는 구조체.
-RECT	g_tPlayerRC = {100, 100, 200, 200};
+RECTANGLE	g_tPlayerRC = {100, 100, 200, 200};
+
+//시간을 구하기 위한 변수들
+LARGE_INTEGER g_tSecond;
+LARGE_INTEGER g_tTime;
+float		  g_fDeltaTime;
 
 // 이 코드 모듈에 포함된 함수의 선언을 전달합니다:
 ATOM                MyRegisterClass(HINSTANCE hInstance);
@@ -52,6 +62,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
     MSG msg;
 
+	QueryPerformanceFrequency(&g_tSecond);
+	QueryPerformanceCounter(&g_tTime);
+
     // 기본 메시지 루프입니다:
     while (g_bLoop)
     {
@@ -66,14 +79,20 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		//윈도우 데드타임일 경우
 		else
 		{
+			//프레임을 이용하여 이동속도 조절
+			//단, 매 프레임 간격이 일정하지 않으므로 게임 제작에는 용이하지 않다.
+			/*
 			static int iCount;
 			++iCount;
 
-			if (iCount == 10000)
+			if (iCount == 5000)
 			{
 				iCount = 0;
 				Run();
 			}
+			*/
+
+			Run();
 		}
     }
 
@@ -223,37 +242,77 @@ INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 
 void Run() {
 
+	//Delta Time은 프레임과 프레임 사이의 시간이다.
+	//Delta Time을 구해준다
+	LARGE_INTEGER tTime;
+	QueryPerformanceCounter(&tTime);
+
+	g_fDeltaTime = (tTime.QuadPart - g_tTime.QuadPart) /
+		(float)g_tSecond.QuadPart;
+
+	g_tTime = tTime;
+
+	//슬로우모션 패스트모션
+
+	static float fTimeScale = 1.f;
+
+	if (GetAsyncKeyState(VK_F1) & 0x8000)
+	{
+		fTimeScale -= g_fDeltaTime;
+
+		if (fTimeScale < 0.f)
+			fTimeScale = 0.f;
+	}
+
+	if (GetAsyncKeyState(VK_F2) & 0x8000)
+	{
+		fTimeScale += g_fDeltaTime;
+
+		if (fTimeScale > 1.f)
+			fTimeScale = 1.f;
+	}
+
+	//플레이어 초당 이동속도 : 300
+	float	fSpeed = 300 * g_fDeltaTime * fTimeScale;
+
+
+	//현재 클라이언트 창의 넓이 좌표를 가져오기 쉽게 하는 코드
+	//RECT는 다 LONG이다.
+	RECT rcWindow;
+	GetClientRect(g_hWnd, &rcWindow);
+
+
 	if (GetAsyncKeyState('D') & 0x8000)
 	{
-		if (g_tPlayerRC.right < 800) {
-			g_tPlayerRC.left += 1;
-			g_tPlayerRC.right += 1;
+		if (g_tPlayerRC.r < rcWindow.right) {
+			g_tPlayerRC.l += fSpeed;
+			g_tPlayerRC.r += fSpeed;
 		}
 	}
 
 	if (GetAsyncKeyState('A') & 0x8000)
 	{
-		if (g_tPlayerRC.left > 0) {
-			g_tPlayerRC.left -= 1;
-			g_tPlayerRC.right -= 1;
+		if (g_tPlayerRC.l > rcWindow.left) {
+			g_tPlayerRC.l -= fSpeed;
+			g_tPlayerRC.r -= fSpeed;
 		}
 	}
 	if (GetAsyncKeyState('W') & 0x8000)
 	{
-		if (g_tPlayerRC.top > 0) {
-			g_tPlayerRC.top -= 1;
-			g_tPlayerRC.bottom -= 1;
+		if (g_tPlayerRC.t > rcWindow.top) {
+			g_tPlayerRC.t -= fSpeed;
+			g_tPlayerRC.b -= fSpeed;
 		}
 	}
 
 	if (GetAsyncKeyState('S') & 0x8000)
 	{
-		if (g_tPlayerRC.bottom < 600) {
-			g_tPlayerRC.top += 1;
-			g_tPlayerRC.bottom += 1;
+		if (g_tPlayerRC.b < rcWindow.bottom) {
+			g_tPlayerRC.t += fSpeed;
+			g_tPlayerRC.b += fSpeed;
 		}
 	}
 
-	Rectangle(g_hDC, g_tPlayerRC.left, g_tPlayerRC.top,
-		g_tPlayerRC.right, g_tPlayerRC.bottom);
+	Rectangle(g_hDC, g_tPlayerRC.l, g_tPlayerRC.t,
+		g_tPlayerRC.r, g_tPlayerRC.b);
 }
