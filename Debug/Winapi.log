@@ -1,6 +1,10 @@
 ﻿  Winapi.cpp
-D:\Files\Programming\Study\Winapi\Winapi.cpp(317,29): warning C4244: '인수': 'float'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-D:\Files\Programming\Study\Winapi\Winapi.cpp(317,14): warning C4244: '인수': 'float'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-D:\Files\Programming\Study\Winapi\Winapi.cpp(316,45): warning C4244: '인수': 'float'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-D:\Files\Programming\Study\Winapi\Winapi.cpp(316,30): warning C4244: '인수': 'float'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+D:\Files\Programming\Study\Winapi\Winapi.cpp(376,29): warning C4244: '인수': 'float'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+D:\Files\Programming\Study\Winapi\Winapi.cpp(376,14): warning C4244: '인수': 'float'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+D:\Files\Programming\Study\Winapi\Winapi.cpp(375,45): warning C4244: '인수': 'float'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+D:\Files\Programming\Study\Winapi\Winapi.cpp(375,30): warning C4244: '인수': 'float'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+D:\Files\Programming\Study\Winapi\Winapi.cpp(379,72): warning C4244: '인수': 'float'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+D:\Files\Programming\Study\Winapi\Winapi.cpp(379,58): warning C4244: '인수': 'float'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+D:\Files\Programming\Study\Winapi\Winapi.cpp(379,44): warning C4244: '인수': 'float'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+D:\Files\Programming\Study\Winapi\Winapi.cpp(379,30): warning C4244: '인수': 'float'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
   Winapi.vcxproj -> D:\Files\Programming\Study\Winapi\Debug\Winapi.exe

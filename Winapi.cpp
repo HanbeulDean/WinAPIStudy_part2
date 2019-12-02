@@ -3,6 +3,9 @@
 
 #include "framework.h"
 #include "Winapi.h"
+#include <list>
+
+using namespace std;
 
 #define MAX_LOADSTRING 100
 
@@ -20,6 +23,16 @@ HDC		g_hDC;
 bool	g_bLoop = true;
 //RECT는 사각형을 그리기 위한 좌표값을 담는 구조체.
 RECTANGLE	g_tPlayerRC = {100, 100, 200, 200};
+
+typedef struct _tagBullet
+{
+	RECTANGLE rc;
+	float fDist;
+	float fLimitDist;
+}BULLET, *PBULLET;
+
+// 플레이어 총알
+list<BULLET> g_PlayerBulletList;
 
 //시간을 구하기 위한 변수들
 LARGE_INTEGER g_tSecond;
@@ -273,7 +286,21 @@ void Run() {
 	}
 
 	//플레이어 초당 이동속도 : 300
-	float	fSpeed = 300 * g_fDeltaTime * fTimeScale;
+	float	fSpeed = 400.f * g_fDeltaTime * fTimeScale;
+
+	if (GetAsyncKeyState(VK_SPACE) & 0x8000)
+	{
+		BULLET tBullet;
+
+		tBullet.rc.l = g_tPlayerRC.r;
+		tBullet.rc.r = g_tPlayerRC.r + 50.f;
+		tBullet.rc.t = (g_tPlayerRC.t + g_tPlayerRC.b) / 2.f -25;
+		tBullet.rc.b = (g_tPlayerRC.t + g_tPlayerRC.b) / 2.f + 25;
+		tBullet.fDist = 0.f;
+		tBullet.fLimitDist = 500.f;
+
+		g_PlayerBulletList.push_back(tBullet);
+	}
 
 
 	//현재 클라이언트 창의 넓이 좌표를 가져오기 쉽게 하는 코드
@@ -313,6 +340,42 @@ void Run() {
 		}
 	}
 
+	//플레이어 총알 이동
+
+	list<BULLET>::iterator iter;
+	list<BULLET>::iterator iterEnd = g_PlayerBulletList.end();
+
+	fSpeed = 800.f * g_fDeltaTime * fTimeScale;
+
+
+	for (iter = g_PlayerBulletList.begin(); iter != iterEnd;)
+	{
+		(*iter).rc.l += fSpeed;
+		(*iter).rc.r += fSpeed;
+
+		(*iter).fDist += fSpeed;
+
+		if ((*iter).fDist >= (*iter).fLimitDist) {
+			iter = g_PlayerBulletList.erase(iter);
+			iterEnd = g_PlayerBulletList.end();
+		}
+
+		else if ((*iter).rc.l >= 800) {
+			iter = g_PlayerBulletList.erase(iter);
+			iterEnd = g_PlayerBulletList.end();
+		}
+		else
+			++iter;
+	}
+
+	//출력
+
+	Rectangle(g_hDC, 0, 0, 800, 600);
+
 	Rectangle(g_hDC, g_tPlayerRC.l, g_tPlayerRC.t,
 		g_tPlayerRC.r, g_tPlayerRC.b);
+
+	for (iter = g_PlayerBulletList.begin(); iter != iterEnd; ++iter) {
+		Rectangle(g_hDC, (*iter).rc.l, (*iter).rc.t, (*iter).rc.r, (*iter).rc.b);
+	}
 }
